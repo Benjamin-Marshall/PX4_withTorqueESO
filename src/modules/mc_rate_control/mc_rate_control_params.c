@@ -292,3 +292,8 @@ PARAM_DEFINE_FLOAT(MC_YAWRATE_K, 1.0f);
  * @group Multicopter Rate Control
  */
 PARAM_DEFINE_INT32(MC_BAT_SCALE_EN, 0);
+
+
+/////////////////// MY PARAMS ///////////////////
+
+PARAM_DEFINE_INT32(USE_ESO, 0);

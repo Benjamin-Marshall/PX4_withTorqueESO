@@ -113,10 +113,14 @@ private:
 	uORB::Publication<vehicle_thrust_setpoint_s>	_vehicle_thrust_setpoint_pub;
 
 	// My custom stuff 
+	
+	// Test we can subscribe to a new state, multiply it by a number, and print it 
 	uORB::Subscription _vehicle_position_sub{ORB_ID(vehicle_local_position)};
 	vehicle_local_position_s _vehicle_local_position{};
 	double test; 
 	double test2; 
+	bool BenDebug = 0; // Turn this new and amazing feature on and off 
+	bool _should_run_eso = 0; // Should we run the torque level ESO? 1 for yes, default matches the parameter
 
 	vehicle_control_mode_s	_vehicle_control_mode{};
 	vehicle_status_s	_vehicle_status{};
@@ -167,7 +171,10 @@ private:
 		(ParamFloat<px4::params::MC_ACRO_EXPO_Y>) _param_mc_acro_expo_y,				/**< expo stick curve shape (yaw) */
 		(ParamFloat<px4::params::MC_ACRO_SUPEXPO>) _param_mc_acro_supexpo,		/**< superexpo stick curve shape (roll & pitch) */
 		(ParamFloat<px4::params::MC_ACRO_SUPEXPOY>) _param_mc_acro_supexpoy,		/**< superexpo stick curve shape (yaw) */
+		(ParamBool<px4::params::MC_BAT_SCALE_EN>) _param_mc_bat_scale_en,
+
 		(ParamFloat<px4::params::TEST_PARAM>) 	_a_test_param,
-		(ParamBool<px4::params::MC_BAT_SCALE_EN>) _param_mc_bat_scale_en
+		(ParamInt<px4::params::USE_ESO>)	_param_should_eso // 1 if we should run torque eso, 0 if not 
+
 	)
 };

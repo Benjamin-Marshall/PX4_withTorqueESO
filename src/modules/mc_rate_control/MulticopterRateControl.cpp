@@ -95,6 +95,8 @@ MulticopterRateControl::parameters_updated()
 	// manual rate control acro mode rate limits
 	_acro_rate_max = Vector3f(radians(_param_mc_acro_r_max.get()), radians(_param_mc_acro_p_max.get()),
 				  radians(_param_mc_acro_y_max.get()));
+
+	_should_run_eso = _param_should_eso.get();
 }
 
 void
@@ -135,12 +137,11 @@ MulticopterRateControl::Run()
 		/* check for updates in other topics */
 		_vehicle_control_mode_sub.update(&_vehicle_control_mode);
 
-		if (_vehicle_control_mode.flag_control_offboard_enabled == true){
+		if (_vehicle_control_mode.flag_control_offboard_enabled == true && BenDebug){
 			_vehicle_position_sub.update(&_vehicle_local_position);
 			test = _vehicle_local_position.x; 
 			test2 = static_cast<double>(_a_test_param.get())*test; 
 			printf("test val %f \t %f \n", test, test2);
-			// PX4_INFO("%3f",test);
 		}
 
 		if (_vehicle_land_detected_sub.updated()) {
@@ -269,10 +270,12 @@ MulticopterRateControl::Run()
 				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
 			} else
 			{
-				// for (int i = 0; i < 3; i++){
-				// 	vehicle_thrust_setpoint.xyz[i] = 0.0f;
-				// 	vehicle_torque_setpoint.xyz[i] = 0.0f;
-				// }
+				if (_should_run_eso){
+					printf("We are running the ESO");
+				} else if (_should_run_eso == false){
+					printf("we are not running the ESO");
+				}
+
 				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
 				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
 			}
