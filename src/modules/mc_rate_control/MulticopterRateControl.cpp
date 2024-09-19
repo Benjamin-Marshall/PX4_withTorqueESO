@@ -135,9 +135,9 @@ MulticopterRateControl::Run()
 		/* check for updates in other topics */
 		_vehicle_control_mode_sub.update(&_vehicle_control_mode);
 
-		if (_vehicle_control_mode.flag_control_offboard_enabled == true){
-			PX4_INFO("In offboard mode!");
-		}
+		// if (_vehicle_control_mode.flag_control_offboard_enabled == true){
+			// PX4_INFO("In offboard mode!");
+		// }
 
 		if (_vehicle_land_detected_sub.updated()) {
 			vehicle_land_detected_s vehicle_land_detected;
@@ -255,11 +255,25 @@ MulticopterRateControl::Run()
 
 			vehicle_thrust_setpoint.timestamp_sample = angular_velocity.timestamp_sample;
 			vehicle_thrust_setpoint.timestamp = hrt_absolute_time();
-			_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
+
 
 			vehicle_torque_setpoint.timestamp_sample = angular_velocity.timestamp_sample;
 			vehicle_torque_setpoint.timestamp = hrt_absolute_time();
-			_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
+
+			if (_vehicle_control_mode.flag_control_offboard_enabled == false){
+				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
+				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
+			} else
+			{
+				for (int i = 0; i < 3; i++){
+					vehicle_thrust_setpoint.xyz[i] = 0.0f;
+					vehicle_torque_setpoint.xyz[i] = 0.0f;
+				}
+				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
+				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
+			}
+
+
 
 			updateActuatorControlsStatus(vehicle_torque_setpoint, dt);
 
