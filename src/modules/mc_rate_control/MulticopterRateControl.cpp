@@ -135,6 +135,10 @@ MulticopterRateControl::Run()
 		/* check for updates in other topics */
 		_vehicle_control_mode_sub.update(&_vehicle_control_mode);
 
+		if (_vehicle_control_mode.flag_control_offboard_enabled == true){
+			PX4_INFO("In offboard mode!");
+		}
+
 		if (_vehicle_land_detected_sub.updated()) {
 			vehicle_land_detected_s vehicle_land_detected;
 
