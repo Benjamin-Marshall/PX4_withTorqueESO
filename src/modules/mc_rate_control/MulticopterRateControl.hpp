@@ -60,7 +60,7 @@
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 #include <uORB/topics/vehicle_torque_setpoint.h>
 
-// My custom stuff 
+// My custom stuff
 #include <uORB/topics/vehicle_local_position.h>
 
 using namespace time_literals;
@@ -112,15 +112,19 @@ private:
 	uORB::Publication<vehicle_torque_setpoint_s>	_vehicle_torque_setpoint_pub;
 	uORB::Publication<vehicle_thrust_setpoint_s>	_vehicle_thrust_setpoint_pub;
 
-	// My custom stuff 
-	
-	// Test we can subscribe to a new state, multiply it by a number, and print it 
+	// My custom stuff
+
+	// Test we can subscribe to a new state, multiply it by a number, and print it
 	uORB::Subscription _vehicle_position_sub{ORB_ID(vehicle_local_position)};
 	vehicle_local_position_s _vehicle_local_position{};
-	double test; 
-	double test2; 
-	bool BenDebug = 0; // Turn this new and amazing feature on and off 
+	double test;
+	double test2;
+	bool BenDebug = 0; // Turn this new and amazing feature on and off
 	bool _should_run_eso = 0; // Should we run the torque level ESO? 1 for yes, default matches the parameter
+
+	matrix::Vector3f eso_pos, eso_vel, eso_acc;
+	matrix::Vector3f eso_gain_col1, eso_gain_col2, inertia_xyz;
+	float u_unNormalize;
 
 	vehicle_control_mode_s	_vehicle_control_mode{};
 	vehicle_status_s	_vehicle_status{};
@@ -173,8 +177,21 @@ private:
 		(ParamFloat<px4::params::MC_ACRO_SUPEXPOY>) _param_mc_acro_supexpoy,		/**< superexpo stick curve shape (yaw) */
 		(ParamBool<px4::params::MC_BAT_SCALE_EN>) _param_mc_bat_scale_en,
 
-		(ParamFloat<px4::params::TEST_PARAM>) 	_a_test_param,
-		(ParamInt<px4::params::USE_ESO>)	_param_should_eso // 1 if we should run torque eso, 0 if not 
+		// (ParamFloat<px4::params::TEST_PARAM>) 	_a_test_param,
+		(ParamInt<px4::params::ESO_ENABLED>)	_param_should_eso, // 1 if we should run torque eso, 0 if not
+
+		(ParamFloat<px4::params::ESO_L11>)	_param_esogain_11,
+		(ParamFloat<px4::params::ESO_L21>)	_param_esogain_21,
+		(ParamFloat<px4::params::ESO_L31>)	_param_esogain_31,
+
+		(ParamFloat<px4::params::ESO_L12>)	_param_esogain_12,
+		(ParamFloat<px4::params::ESO_L22>)	_param_esogain_22,
+		(ParamFloat<px4::params::ESO_L32>)	_param_esogain_32,
+
+		(ParamFloat<px4::params::ESO_IXX>)	_param_eso_inertia_xx,
+		(ParamFloat<px4::params::ESO_IYY>)	_param_eso_inertia_yy,
+		(ParamFloat<px4::params::ESO_IZZ>)	_param_eso_inertia_zz,
+		(ParamFloat<px4::params::ESO_U_SCALE>)	_param_eso_u_mult
 
 	)
 };

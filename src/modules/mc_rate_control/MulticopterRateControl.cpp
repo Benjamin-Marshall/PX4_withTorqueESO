@@ -96,7 +96,35 @@ MulticopterRateControl::parameters_updated()
 	_acro_rate_max = Vector3f(radians(_param_mc_acro_r_max.get()), radians(_param_mc_acro_p_max.get()),
 				  radians(_param_mc_acro_y_max.get()));
 
+
+	///////////////////// ESO STUFF HERE /////////////////////
 	_should_run_eso = _param_should_eso.get();
+
+	eso_gain_col1(0) = _param_esogain_11.get();
+	eso_gain_col1(1) = _param_esogain_21.get();
+	eso_gain_col1(2) = _param_esogain_31.get();
+
+	eso_gain_col2(0) = _param_esogain_12.get();
+	eso_gain_col2(1) = _param_esogain_22.get();
+	eso_gain_col2(2) = _param_esogain_32.get();
+
+	inertia_xyz(0) = _param_eso_inertia_xx.get();
+	inertia_xyz(1) = _param_eso_inertia_yy.get();
+	inertia_xyz(2) = _param_eso_inertia_zz.get();
+
+	u_unNormalize  = _param_eso_u_mult.get();
+
+
+
+	for (int axis = 0; axis < 3; axis++){
+
+		eso_pos(axis) = 0.0f;
+		eso_vel(axis) = 0.0f;
+		eso_acc(axis) = 0.0f;
+
+	}
+	///////////////////// ESO STUFF HERE /////////////////////
+
 }
 
 void
@@ -137,12 +165,12 @@ MulticopterRateControl::Run()
 		/* check for updates in other topics */
 		_vehicle_control_mode_sub.update(&_vehicle_control_mode);
 
-		if (_vehicle_control_mode.flag_control_offboard_enabled == true && BenDebug){
-			_vehicle_position_sub.update(&_vehicle_local_position);
-			test = _vehicle_local_position.x; 
-			test2 = static_cast<double>(_a_test_param.get())*test; 
-			printf("test val %f \t %f \n", test, test2);
-		}
+		// if (_vehicle_control_mode.flag_control_offboard_enabled == true && BenDebug){
+		// 	_vehicle_position_sub.update(&_vehicle_local_position);
+		// 	test = _vehicle_local_position.x;
+		// 	test2 = static_cast<double>(_a_test_param.get())*test;
+		// 	printf("test val %f \t %f \n", test, test2);
+		// }
 
 		if (_vehicle_land_detected_sub.updated()) {
 			vehicle_land_detected_s vehicle_land_detected;
@@ -265,21 +293,53 @@ MulticopterRateControl::Run()
 			vehicle_torque_setpoint.timestamp_sample = angular_velocity.timestamp_sample;
 			vehicle_torque_setpoint.timestamp = hrt_absolute_time();
 
-			if (_vehicle_control_mode.flag_control_offboard_enabled == false){
-				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
-				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
-			} else
+			/////////////////////// ADDED ESO HERE AND BELOW ///////////////////////
+			float k_eso = 0.1, k_d = 0.001;
+
+			if ( (_should_run_eso == 1) & (_vehicle_control_mode.flag_control_offboard_enabled == true) )
 			{
-				if (_should_run_eso){
-					printf("We are running the ESO");
-				} else if (_should_run_eso == false){
-					printf("we are not running the ESO");
-				}
+				// If in offboard AND the eso is enabled, run the ESO
+				for (int axis = 0; axis < 3; axis++){
+				/* For the ESO, for ease of implementation, use 1 augmented state and multiply it out symbolically. e.g. the per-axis ESO becomes
 
+				x = [x1,x2]^T
+				z = [z1,z2,z3]^T
+				A = upper triangular 3 x 3
+				B = [0 1/In 0]^T
+				L = 4 x 2 gain matrix
+				C = [1 0 0 0; 0 1 0 0]
+
+				zd = A*z + B*u + L*(C*z - x)
+				u* = u + In*3
+
+				For implementation multiply this out to so each axis can be captured in a single loop i.e.
+
+				z_1_dot = z2 - L1_1*(m1 - z1) - L1_2*(m2 - z2)
+				z_2_dot = z3 - L2_1*(m1 - z1) - L2_2*(m2 - z2) + u/In
+          			z_3_dot = - L3_1*(m1 - z1) - L2_3*(m2 - z2)
+
+				*/
+				// Baseline PD controller
+				vehicle_torque_setpoint.xyz[axis] = k_eso*(_rates_setpoint(axis) - rates(axis)) - k_d*(angular_accel(axis));
+				vehicle_torque_setpoint.xyz[axis] -= eso_vel(axis)*inertia_xyz(axis);
+				// Update ESO state
+				eso_pos(axis) += dt*( eso_vel(axis) - eso_gain_col1(0)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(0)*(angular_accel(axis) - eso_vel(axis)) );
+				eso_vel(axis) += dt*( eso_acc(axis) - eso_gain_col1(1)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(1)*(angular_accel(axis) - eso_vel(axis)) + u_unNormalize*vehicle_torque_setpoint.xyz[axis]/inertia_xyz(axis));
+				eso_acc(axis) += dt*( -eso_gain_col1(2)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(2)*(angular_accel(axis) - eso_vel(axis)) );
+
+				}
+				// printf("woohoo?");
+				// printf("Est rate  \t %f\t %f\t %f",eso_pos(0),eso_pos(1),eso_pos(3));
+				// printf("real rate \t %f\t %f\t %f",rates(0),rates(1),rates(3));
 				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
 				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
-			}
+			} else {
 
+				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
+					_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
+
+			}
+			/////////////////////// ADDED ESO ABOVE ///////////////////////
 
 
 			updateActuatorControlsStatus(vehicle_torque_setpoint, dt);
