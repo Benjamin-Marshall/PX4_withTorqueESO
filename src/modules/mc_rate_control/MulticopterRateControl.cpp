@@ -114,8 +114,6 @@ MulticopterRateControl::parameters_updated()
 
 	u_unNormalize  = _param_eso_u_mult.get();
 
-
-
 	for (int axis = 0; axis < 3; axis++){
 
 		eso_pos(axis) = 0.0f;
@@ -295,6 +293,7 @@ MulticopterRateControl::Run()
 
 			/////////////////////// ADDED ESO HERE AND BELOW ///////////////////////
 			float k_eso = 0.1, k_d = 0.001;
+			eso_state_s eso_msg_to_pub{};
 
 			if ( (_should_run_eso == 1) & (_vehicle_control_mode.flag_control_offboard_enabled == true) )
 			{
@@ -321,11 +320,19 @@ MulticopterRateControl::Run()
 				*/
 				// Baseline PD controller
 				vehicle_torque_setpoint.xyz[axis] = k_eso*(_rates_setpoint(axis) - rates(axis)) - k_d*(angular_accel(axis));
-				vehicle_torque_setpoint.xyz[axis] -= eso_vel(axis)*inertia_xyz(axis);
+				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis);
 				// Update ESO state
 				eso_pos(axis) += dt*( eso_vel(axis) - eso_gain_col1(0)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(0)*(angular_accel(axis) - eso_vel(axis)) );
 				eso_vel(axis) += dt*( eso_acc(axis) - eso_gain_col1(1)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(1)*(angular_accel(axis) - eso_vel(axis)) + u_unNormalize*vehicle_torque_setpoint.xyz[axis]/inertia_xyz(axis));
 				eso_acc(axis) += dt*( -eso_gain_col1(2)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(2)*(angular_accel(axis) - eso_vel(axis)) );
+
+				eso_msg_to_pub.state[axis] = eso_pos(axis);
+				eso_msg_to_pub.state[axis+3] = eso_vel(axis);
+				eso_msg_to_pub.state[axis+6] = eso_acc(axis);
+				
+				eso_msg_to_pub.timestamp_sample = angular_velocity.timestamp_sample;
+				eso_msg_to_pub.timestamp = hrt_absolute_time();
+				_eso_state_pub.publish(eso_msg_to_pub);
 
 				}
 				// printf("woohoo?");
@@ -336,7 +343,7 @@ MulticopterRateControl::Run()
 			} else {
 
 				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
-					_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
+				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
 
 			}
 			/////////////////////// ADDED ESO ABOVE ///////////////////////

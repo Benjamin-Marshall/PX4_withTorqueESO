@@ -1,0 +1,26 @@
+clearvars; clc; 
+
+%% Vars
+syms x y z xd yd zd add1 add2 add3 Ixx Iyy Izz;
+syms x1 x2 x3 xd1 xd2 xd3;
+syms t1 t2 t3; % inputs
+angle = [a1; a2; a3];
+angleRate = [ad1; ad2; ad3];
+angularAcc = [add1; add2; add3];
+
+state = [angle;angleRate;angularAcc];
+measurement = [x1;x2;x3; xd1;xd2;xd3];
+
+inertiaVars = [Ixx; Iyy; Izz];
+
+
+%% Matrices
+
+A = [zeros(3), eye(3), zeros(3);zeros(3,6),eye(3);zeros(3,9)];
+B = [zeros(3);[inertiaVars(1),0,0;0,inertiaVars(2),0;0,0,inertiaVars(3)];zeros(3)];
+C = [eye(3),zeros(3,6);zeros(3),eye(3),zeros(3)];
+Gain = sym('L',[9,6]);
+
+%% Overall
+
+stateDot = A*state + B*[t1;t2;t3] + Gain*(measurement - C*state);

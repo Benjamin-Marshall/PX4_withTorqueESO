@@ -62,6 +62,7 @@
 
 // My custom stuff
 #include <uORB/topics/vehicle_local_position.h>
+#include <uORB/topics/eso_state.h>
 
 using namespace time_literals;
 
@@ -113,6 +114,7 @@ private:
 	uORB::Publication<vehicle_thrust_setpoint_s>	_vehicle_thrust_setpoint_pub;
 
 	// My custom stuff
+	uORB::Publication<eso_state_s> _eso_state_pub{ORB_ID(eso_state)};
 
 	// Test we can subscribe to a new state, multiply it by a number, and print it
 	uORB::Subscription _vehicle_position_sub{ORB_ID(vehicle_local_position)};
@@ -125,6 +127,7 @@ private:
 	matrix::Vector3f eso_pos, eso_vel, eso_acc;
 	matrix::Vector3f eso_gain_col1, eso_gain_col2, inertia_xyz;
 	float u_unNormalize;
+	float eso_state_variable[9];
 
 	vehicle_control_mode_s	_vehicle_control_mode{};
 	vehicle_status_s	_vehicle_status{};

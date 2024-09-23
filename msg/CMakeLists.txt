@@ -261,6 +261,8 @@ set(msg_files
 	WheelEncoders.msg
 	Wind.msg
 	YawEstimatorStatus.msg
+	EsoState.msg # My custom ESO topic 
+
 )
 list(SORT msg_files)
 
