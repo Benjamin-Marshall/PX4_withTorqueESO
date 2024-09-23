@@ -144,7 +144,7 @@ void LoggedTopics::add_default_topics()
 	add_optional_topic("vtol_vehicle_status", 200);
 	add_topic("wind", 1000);
 	// My eso topic 
-	add_topic("eso_state", 100);
+	add_topic("eso_state", 20);
 
 	// multi topics
 	add_optional_topic_multi("actuator_outputs", 100, 3);

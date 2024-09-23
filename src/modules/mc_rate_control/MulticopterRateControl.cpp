@@ -321,10 +321,11 @@ MulticopterRateControl::Run()
 				// Baseline PD controller
 				vehicle_torque_setpoint.xyz[axis] = k_eso*(_rates_setpoint(axis) - rates(axis)) - k_d*(angular_accel(axis));
 				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis);
+				vehicle_torque_setpoint.xyz[axis] = math::constrain(vehicle_torque_setpoint.xyz[axis],-1.f,1.0f);
 				// Update ESO state
-				eso_pos(axis) += dt*( eso_vel(axis) - eso_gain_col1(0)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(0)*(angular_accel(axis) - eso_vel(axis)) );
-				eso_vel(axis) += dt*( eso_acc(axis) - eso_gain_col1(1)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(1)*(angular_accel(axis) - eso_vel(axis)) + u_unNormalize*vehicle_torque_setpoint.xyz[axis]/inertia_xyz(axis));
-				eso_acc(axis) += dt*( -eso_gain_col1(2)*(rates(axis) - eso_pos(axis)) - eso_gain_col2(2)*(angular_accel(axis) - eso_vel(axis)) );
+				eso_pos(axis) += dt*( eso_vel(axis) + eso_gain_col1(0)*(rates(axis) - eso_pos(axis)) + eso_gain_col2(0)*(angular_accel(axis) - eso_vel(axis)) );
+				eso_vel(axis) += dt*( eso_acc(axis) + eso_gain_col1(1)*(rates(axis) - eso_pos(axis)) + eso_gain_col2(1)*(angular_accel(axis) - eso_vel(axis)) + u_unNormalize*vehicle_torque_setpoint.xyz[axis]/inertia_xyz(axis));
+				eso_acc(axis) += dt*( eso_gain_col1(2)*(rates(axis) - eso_pos(axis)) + eso_gain_col2(2)*(angular_accel(axis) - eso_vel(axis)) );
 
 				eso_msg_to_pub.state[axis] = eso_pos(axis);
 				eso_msg_to_pub.state[axis+3] = eso_vel(axis);
@@ -341,7 +342,11 @@ MulticopterRateControl::Run()
 				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
 				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
 			} else {
-
+				for (int i = 0; i<3 ; i++){
+					eso_pos(i) = 0.0f;
+					eso_vel(i) = 0.0f;
+					eso_acc(i) = 0.0f;
+				}
 				_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
 				_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
 
