@@ -224,6 +224,11 @@ MulticopterRateControl::Run()
 			// reset integral if disarmed
 			if (!_vehicle_control_mode.flag_armed || _vehicle_status.vehicle_type != vehicle_status_s::VEHICLE_TYPE_ROTARY_WING) {
 				_rate_control.resetIntegral();
+				for (int i = 0; i < 3; i++){
+					eso_pos(i) = 0.0f;
+					eso_vel(i) = 0.0f;
+					eso_acc(i) = 0.0f;
+				}
 			}
 
 			// update saturation status from control allocation feedback
@@ -318,6 +323,16 @@ MulticopterRateControl::Run()
           			z_3_dot = - L3_1*(m1 - z1) - L2_3*(m2 - z2)
 
 				*/
+				// Reset on landed
+				if (_landed || _maybe_landed){
+					for (int i = 0; i < 3; i++){
+						eso_pos(i) = 0.0f;
+						eso_vel(i) = 0.0f;
+						eso_acc(i) = 0.0f;
+					}
+				}
+
+
 				// Baseline PD controller
 				vehicle_torque_setpoint.xyz[axis] = k_eso*(_rates_setpoint(axis) - rates(axis)) - k_d*(angular_accel(axis));
 				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis);
@@ -330,7 +345,7 @@ MulticopterRateControl::Run()
 				eso_msg_to_pub.state[axis] = eso_pos(axis);
 				eso_msg_to_pub.state[axis+3] = eso_vel(axis);
 				eso_msg_to_pub.state[axis+6] = eso_acc(axis);
-				
+
 				eso_msg_to_pub.timestamp_sample = angular_velocity.timestamp_sample;
 				eso_msg_to_pub.timestamp = hrt_absolute_time();
 				_eso_state_pub.publish(eso_msg_to_pub);
