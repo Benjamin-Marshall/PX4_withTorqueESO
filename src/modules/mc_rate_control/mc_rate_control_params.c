@@ -298,16 +298,16 @@ PARAM_DEFINE_INT32(MC_BAT_SCALE_EN, 0);
 
 PARAM_DEFINE_INT32(ESO_ENABLED, 0); // Turn rate level ESO on or off
 // ESO GAINS
-PARAM_DEFINE_FLOAT(ESO_L11, 0.0432f); // First column
-PARAM_DEFINE_FLOAT(ESO_L21, 0.1456f);
-PARAM_DEFINE_FLOAT(ESO_L31, 0.0812f);
+PARAM_DEFINE_FLOAT(ESO_L11, 5.304f); // First column
+PARAM_DEFINE_FLOAT(ESO_L21, -3.737f);
+PARAM_DEFINE_FLOAT(ESO_L31, -1.986f);
 
-PARAM_DEFINE_FLOAT(ESO_L12, 1.1343f); // Second column
-PARAM_DEFINE_FLOAT(ESO_L22, 3.2868f);
-PARAM_DEFINE_FLOAT(ESO_L32, 0.8764f);
+PARAM_DEFINE_FLOAT(ESO_L12, -2.658f); // Second column
+PARAM_DEFINE_FLOAT(ESO_L22, 50.200f);
+PARAM_DEFINE_FLOAT(ESO_L32, 24.938f);
 
 
-////////// Working but slow ////////// 
+////////// Working but slow //////////
 // PARAM_DEFINE_FLOAT(ESO_L11, 0.0101f); // First column
 
 // PARAM_DEFINE_FLOAT(ESO_L21, 0.0079f);
@@ -322,5 +322,5 @@ PARAM_DEFINE_FLOAT(ESO_IXX, 0.0216f); // Vehicle inertias
 PARAM_DEFINE_FLOAT(ESO_IYY, 0.0216f);
 PARAM_DEFINE_FLOAT(ESO_IZZ, 0.04f);
 PARAM_DEFINE_FLOAT(ESO_U_SCALE, 1.6762f); // un-normalize the torque input. Currently based on mg/(4 * hover throttle)
-// 1.67625036592 
+// 1.67625036592
 // 6.812f without taking moment arm length into account

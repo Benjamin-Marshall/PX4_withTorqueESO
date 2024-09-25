@@ -297,11 +297,15 @@ MulticopterRateControl::Run()
 			vehicle_torque_setpoint.timestamp = hrt_absolute_time();
 
 			/////////////////////// ADDED ESO HERE AND BELOW ///////////////////////
-			float k_eso = 0.1, k_d = 0.001;
+			float k_eso = 0.175, k_d = 0.003;
 			eso_state_s eso_msg_to_pub{};
 
-			if ( (_should_run_eso == 1) & (_vehicle_control_mode.flag_control_offboard_enabled == true) )
+			if ( (_should_run_eso == 1) )
 			{
+				if ( _eso_started ){
+					PX4_INFO("ESO has started!");
+					_eso_started = false;
+				}
 				// If in offboard AND the eso is enabled, run the ESO
 				for (int axis = 0; axis < 3; axis++){
 				/* For the ESO, for ease of implementation, use 1 augmented state and multiply it out symbolically. e.g. the per-axis ESO becomes
@@ -335,7 +339,7 @@ MulticopterRateControl::Run()
 
 				// Baseline PD controller
 				vehicle_torque_setpoint.xyz[axis] = k_eso*(_rates_setpoint(axis) - rates(axis)) - k_d*(angular_accel(axis));
-				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis);
+				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis)/u_unNormalize;
 				vehicle_torque_setpoint.xyz[axis] = math::constrain(vehicle_torque_setpoint.xyz[axis],-1.f,1.0f);
 				// Update ESO state
 				eso_pos(axis) += dt*( eso_vel(axis) + eso_gain_col1(0)*(rates(axis) - eso_pos(axis)) + eso_gain_col2(0)*(angular_accel(axis) - eso_vel(axis)) );

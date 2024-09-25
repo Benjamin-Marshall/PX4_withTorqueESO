@@ -134,6 +134,7 @@ private:
 
 	bool _landed{true};
 	bool _maybe_landed{true};
+	bool _eso_started = true;
 
 	hrt_abstime _last_run{0};
 

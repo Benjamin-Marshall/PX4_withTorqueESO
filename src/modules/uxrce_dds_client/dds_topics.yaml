@@ -118,8 +118,8 @@ subscriptions:
   - topic: /fmu/in/telemetry_status
     type: px4_msgs::msg::TelemetryStatus
 
-  - topic: /fmu/in/trajectory_setpoint
-    type: px4_msgs::msg::TrajectorySetpoint
+#  - topic: /fmu/in/trajectory_setpoint
+#    type: px4_msgs::msg::TrajectorySetpoint
 
   - topic: /fmu/in/vehicle_attitude_setpoint
     type: px4_msgs::msg::VehicleAttitudeSetpoint
@@ -148,17 +148,17 @@ subscriptions:
   - topic: /fmu/in/vehicle_thrust_setpoint
     type: px4_msgs::msg::VehicleThrustSetpoint
 
-  - topic: /fmu/in/vehicle_torque_setpoint
-    type: px4_msgs::msg::VehicleTorqueSetpoint
+#  - topic: /fmu/in/vehicle_torque_setpoint
+#    type: px4_msgs::msg::VehicleTorqueSetpoint
 
-  - topic: /fmu/in/actuator_motors
-    type: px4_msgs::msg::ActuatorMotors
+#  - topic: /fmu/in/actuator_motors
+#    type: px4_msgs::msg::ActuatorMotors
 
-  - topic: /fmu/in/actuator_servos
-    type: px4_msgs::msg::ActuatorServos
+#  - topic: /fmu/in/actuator_servos
+#    type: px4_msgs::msg::ActuatorServos
 
-  - topic: /fmu/in/aux_global_position
-    type: px4_msgs::msg::VehicleGlobalPosition
+#  - topic: /fmu/in/aux_global_position
+#    type: px4_msgs::msg::VehicleGlobalPosition
 
 # Create uORB::PublicationMulti
 subscriptions_multi:
