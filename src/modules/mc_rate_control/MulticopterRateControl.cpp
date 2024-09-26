@@ -112,6 +112,10 @@ MulticopterRateControl::parameters_updated()
 	inertia_xyz(1) = _param_eso_inertia_yy.get();
 	inertia_xyz(2) = _param_eso_inertia_zz.get();
 
+	ff_gain_vec(0) = _param_mc_rollrate_ff.get();
+	ff_gain_vec(1) = _param_mc_pitchrate_ff.get();
+	ff_gain_vec(2) = _param_mc_yawrate_ff.get();
+
 	u_unNormalize  = _param_eso_u_mult.get();
 
 	for (int axis = 0; axis < 3; axis++){
@@ -338,7 +342,7 @@ MulticopterRateControl::Run()
 
 
 				// Baseline PD controller
-				vehicle_torque_setpoint.xyz[axis] = k_eso*(_rates_setpoint(axis) - rates(axis)) - k_d*(angular_accel(axis));
+				vehicle_torque_setpoint.xyz[axis] = k_eso*(_rates_setpoint(axis) - rates(axis)) - k_d*(angular_accel(axis)) + ff_gain_vec(axis)*_rates_setpoint(axis);
 				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis)/u_unNormalize;
 				vehicle_torque_setpoint.xyz[axis] = math::constrain(vehicle_torque_setpoint.xyz[axis],-1.f,1.0f);
 				// Update ESO state
