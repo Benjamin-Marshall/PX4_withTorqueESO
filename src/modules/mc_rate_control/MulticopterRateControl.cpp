@@ -166,14 +166,6 @@ MulticopterRateControl::Run()
 
 		/* check for updates in other topics */
 		_vehicle_control_mode_sub.update(&_vehicle_control_mode);
-
-		// if (_vehicle_control_mode.flag_control_offboard_enabled == true && BenDebug){
-		// 	_vehicle_position_sub.update(&_vehicle_local_position);
-		// 	test = _vehicle_local_position.x;
-		// 	test2 = static_cast<double>(_a_test_param.get())*test;
-		// 	printf("test val %f \t %f \n", test, test2);
-		// }
-
 		if (_vehicle_land_detected_sub.updated()) {
 			vehicle_land_detected_s vehicle_land_detected;
 
@@ -269,8 +261,9 @@ MulticopterRateControl::Run()
 			// publish thrust and torque setpoints
 			vehicle_thrust_setpoint_s vehicle_thrust_setpoint{};
 			vehicle_torque_setpoint_s vehicle_torque_setpoint{};
-
 			_thrust_setpoint.copyTo(vehicle_thrust_setpoint.xyz);
+
+			if ( !_should_run_eso ){
 			vehicle_torque_setpoint.xyz[0] = PX4_ISFINITE(att_control(0)) ? att_control(0) : 0.f;
 			vehicle_torque_setpoint.xyz[1] = PX4_ISFINITE(att_control(1)) ? att_control(1) : 0.f;
 			vehicle_torque_setpoint.xyz[2] = PX4_ISFINITE(att_control(2)) ? att_control(2) : 0.f;
@@ -292,7 +285,7 @@ MulticopterRateControl::Run()
 					}
 				}
 			}
-
+			}
 			vehicle_thrust_setpoint.timestamp_sample = angular_velocity.timestamp_sample;
 			vehicle_thrust_setpoint.timestamp = hrt_absolute_time();
 

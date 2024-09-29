@@ -29,8 +29,8 @@ publications:
   - topic: /fmu/out/manual_control_setpoint
     type: px4_msgs::msg::ManualControlSetpoint
 
-  - topic: /fmu/out/message_format_response
-    type: px4_msgs::msg::MessageFormatResponse
+#  - topic: /fmu/out/message_format_response
+#    type: px4_msgs::msg::MessageFormatResponse
 
 #  - topic: /fmu/out/position_setpoint_triplet
 #    type: px4_msgs::msg::PositionSetpointTriplet
@@ -38,11 +38,11 @@ publications:
 #  - topic: /fmu/out/sensor_combined
 #    type: px4_msgs::msg::SensorCombined
 
-  - topic: /fmu/out/timesync_status
-    type: px4_msgs::msg::TimesyncStatus
+#  - topic: /fmu/out/timesync_status
+#    type: px4_msgs::msg::TimesyncStatus
 
-  - topic: /fmu/out/vehicle_angular_velocity
-    type: px4_msgs::msg::VehicleAngularVelocity
+#  - topic: /fmu/out/vehicle_angular_velocity
+#    type: px4_msgs::msg::VehicleAngularVelocity
 
 #  - topic: /fmu/out/vehicle_land_detected
 #    type: px4_msgs::msg::VehicleLandDetected
@@ -62,8 +62,8 @@ publications:
 #  - topic: /fmu/out/vehicle_gps_position
 #    type: px4_msgs::msg::SensorGps
 
-  - topic: /fmu/out/vehicle_local_position
-    type: px4_msgs::msg::VehicleLocalPosition
+#  - topic: /fmu/out/vehicle_local_position
+#    type: px4_msgs::msg::VehicleLocalPosition
 
   - topic: /fmu/out/vehicle_odometry
     type: px4_msgs::msg::VehicleOdometry
@@ -103,8 +103,8 @@ subscriptions:
   - topic: /fmu/in/offboard_control_mode
     type: px4_msgs::msg::OffboardControlMode
 
-  - topic: /fmu/in/onboard_computer_status
-    type: px4_msgs::msg::OnboardComputerStatus
+#  - topic: /fmu/in/onboard_computer_status
+#    type: px4_msgs::msg::OnboardComputerStatus
 
 #  - topic: /fmu/in/obstacle_distance
 #    type: px4_msgs::msg::ObstacleDistance
@@ -115,8 +115,8 @@ subscriptions:
 #  - topic: /fmu/in/goto_setpoint
 #    type: px4_msgs::msg::GotoSetpoint
 
-  - topic: /fmu/in/telemetry_status
-    type: px4_msgs::msg::TelemetryStatus
+#  - topic: /fmu/in/telemetry_status
+#    type: px4_msgs::msg::TelemetryStatus
 
 #  - topic: /fmu/in/trajectory_setpoint
 #    type: px4_msgs::msg::TrajectorySetpoint
@@ -124,8 +124,8 @@ subscriptions:
   - topic: /fmu/in/vehicle_attitude_setpoint
     type: px4_msgs::msg::VehicleAttitudeSetpoint
 
-  - topic: /fmu/in/vehicle_mocap_odometry
-    type: px4_msgs::msg::VehicleOdometry
+#  - topic: /fmu/in/vehicle_mocap_odometry
+#    type: px4_msgs::msg::VehicleOdometry
 
   - topic: /fmu/in/vehicle_rates_setpoint
     type: px4_msgs::msg::VehicleRatesSetpoint
