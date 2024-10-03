@@ -62,8 +62,8 @@ publications:
 #  - topic: /fmu/out/vehicle_gps_position
 #    type: px4_msgs::msg::SensorGps
 
-#  - topic: /fmu/out/vehicle_local_position
-#    type: px4_msgs::msg::VehicleLocalPosition
+  - topic: /fmu/out/vehicle_local_position
+    type: px4_msgs::msg::VehicleLocalPosition
 
   - topic: /fmu/out/vehicle_odometry
     type: px4_msgs::msg::VehicleOdometry
@@ -97,8 +97,8 @@ subscriptions:
 #  - topic: /fmu/in/config_control_setpoints
 #    type: px4_msgs::msg::VehicleControlMode
 
-#  - topic: /fmu/in/manual_control_input
-#    type: px4_msgs::msg::ManualControlSetpoint
+  - topic: /fmu/in/manual_control_input
+    type: px4_msgs::msg::ManualControlSetpoint
 
   - topic: /fmu/in/offboard_control_mode
     type: px4_msgs::msg::OffboardControlMode
@@ -124,8 +124,8 @@ subscriptions:
   - topic: /fmu/in/vehicle_attitude_setpoint
     type: px4_msgs::msg::VehicleAttitudeSetpoint
 
-#  - topic: /fmu/in/vehicle_mocap_odometry
-#    type: px4_msgs::msg::VehicleOdometry
+  - topic: /fmu/in/vehicle_mocap_odometry
+    type: px4_msgs::msg::VehicleOdometry
 
   - topic: /fmu/in/vehicle_rates_setpoint
     type: px4_msgs::msg::VehicleRatesSetpoint
