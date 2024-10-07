@@ -116,6 +116,14 @@ MulticopterRateControl::parameters_updated()
 	ff_gain_vec(1) = _param_mc_pitchrate_ff.get();
 	ff_gain_vec(2) = _param_mc_yawrate_ff.get();
 
+	k_gain_vec(0) = _param_mc_rollrate_p.get();
+	k_gain_vec(1) = _param_mc_pitchrate_p.get();
+	k_gain_vec(2) = _param_mc_yawrate_p.get();
+
+	d_gain_vec(0) = _param_mc_rollrate_d.get();
+	d_gain_vec(1) = _param_mc_pitchrate_d.get();
+	d_gain_vec(2) = _param_mc_yawrate_d.get();
+
 	u_unNormalize  = _param_eso_u_mult.get();
 
 	for (int axis = 0; axis < 3; axis++){
@@ -294,7 +302,7 @@ MulticopterRateControl::Run()
 			vehicle_torque_setpoint.timestamp = hrt_absolute_time();
 
 			/////////////////////// ADDED ESO HERE AND BELOW ///////////////////////
-			float k_eso = 0.175, k_d = 0.003;
+			// float k_eso = 0.175, k_d = 0.003;
 			eso_state_s eso_msg_to_pub{};
 
 			if ( (_should_run_eso == 1) )
@@ -335,7 +343,7 @@ MulticopterRateControl::Run()
 
 
 				// Baseline PD controller
-				vehicle_torque_setpoint.xyz[axis] = k_eso*(_rates_setpoint(axis) - rates(axis)) - k_d*(angular_accel(axis)) + ff_gain_vec(axis)*_rates_setpoint(axis);
+				vehicle_torque_setpoint.xyz[axis] = k_gain_vec(axis)*(_rates_setpoint(axis) - rates(axis)) - d_gain_vec(axis)*(angular_accel(axis)) + ff_gain_vec(axis)*_rates_setpoint(axis);
 				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis)/u_unNormalize;
 				vehicle_torque_setpoint.xyz[axis] = math::constrain(vehicle_torque_setpoint.xyz[axis],-1.f,1.0f);
 				// Update ESO state

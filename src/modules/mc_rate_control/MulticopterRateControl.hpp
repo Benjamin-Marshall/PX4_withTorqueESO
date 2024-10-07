@@ -125,7 +125,7 @@ private:
 	bool _should_run_eso = 0; // Should we run the torque level ESO? 1 for yes, default matches the parameter
 
 	matrix::Vector3f eso_pos, eso_vel, eso_acc;
-	matrix::Vector3f eso_gain_col1, eso_gain_col2, inertia_xyz, ff_gain_vec;
+	matrix::Vector3f eso_gain_col1, eso_gain_col2, inertia_xyz, ff_gain_vec, k_gain_vec, d_gain_vec;
 	float u_unNormalize;
 	float eso_state_variable[9];
 
