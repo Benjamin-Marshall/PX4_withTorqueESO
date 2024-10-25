@@ -60,6 +60,10 @@
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 #include <uORB/topics/vehicle_torque_setpoint.h>
 
+// Test
+#include <uORB/topics/vehicle_attitude.h>
+#include <uORB/topics/vehicle_attitude_setpoint.h>
+
 // My custom stuff
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/eso_state.h>
@@ -102,6 +106,12 @@ private:
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
 	uORB::Subscription _vehicle_rates_setpoint_sub{ORB_ID(vehicle_rates_setpoint)};
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+
+	// Test stuff
+	uORB::Subscription _att_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
+	uORB::Subscription _vehicle_att_sub{ORB_ID(vehicle_attitude)};
+	matrix::Vector3f att_sp{}, att_sp_degs{};
+	matrix::Vector4f q_d;
 
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 

@@ -343,6 +343,16 @@ MulticopterRateControl::Run()
 
 
 				// Baseline PD controller
+
+				vehicle_attitude_setpoint_s att_sp_msg{};
+				q_d = (matrix::Vector4f) att_sp_msg.q_d;
+				att_sp_degs(0) = atan2f32(2 * (q_d(0)*q_d(1) + q_d(2)*q_d(3)), q_d(0)*q_d(0) - q_d(1)*q_d(1) - q_d(2)*q_d(2) + q_d(3)*q_d(3));
+				att_sp_degs(1) = -1.571f + 2*atan2f32( sqrtf32(1 + 2*(q_d(0)*q_d(2) + q_d(1)*q_d(3))), sqrtf32(1 - 2*(q_d(0)*q_d(2) + q_d(1)*q_d(3))));
+				att_sp_degs(2) = atan2f32( 2* (q_d(0)*q_d(3) + q_d(1)*q_d(2)), 1-2*(q_d(2)*q_d(2) + q_d(1)*q_d(1)));
+
+				// att_sp_degs(axis)
+				// PX4_INFO(att_sp_degs,"\f\t\f\t\f");
+				// vehicle_torque_setpoint.xyz[axis] = k_gain_vec(axis)*(vehicle_attitude_s)
 				vehicle_torque_setpoint.xyz[axis] = k_gain_vec(axis)*(_rates_setpoint(axis) - rates(axis)) - d_gain_vec(axis)*(angular_accel(axis)) + ff_gain_vec(axis)*_rates_setpoint(axis);
 				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis)/u_unNormalize;
 				vehicle_torque_setpoint.xyz[axis] = math::constrain(vehicle_torque_setpoint.xyz[axis],-1.f,1.0f);
