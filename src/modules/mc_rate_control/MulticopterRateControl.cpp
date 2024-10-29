@@ -345,16 +345,30 @@ MulticopterRateControl::Run()
 				// Baseline PD controller
 
 				vehicle_attitude_setpoint_s att_sp_msg{};
+				vehicle_attitude_s att_act{};
+				// if (!_att_setpoint_sub.updated() || !_vehicle_att_sub.updated()){
+				_att_setpoint_sub.update(&att_sp_msg);
+				_vehicle_att_sub.update(&att_act);
+				// } else {
+
+				// q = [w x y z]^T
+				q_act = (matrix::Vector4f) att_act.q;
 				q_d = (matrix::Vector4f) att_sp_msg.q_d;
 				att_sp_degs(0) = atan2f32(2 * (q_d(0)*q_d(1) + q_d(2)*q_d(3)), q_d(0)*q_d(0) - q_d(1)*q_d(1) - q_d(2)*q_d(2) + q_d(3)*q_d(3));
-				att_sp_degs(1) = -1.571f + 2*atan2f32( sqrtf32(1 + 2*(q_d(0)*q_d(2) + q_d(1)*q_d(3))), sqrtf32(1 - 2*(q_d(0)*q_d(2) + q_d(1)*q_d(3))));
+				att_sp_degs(1) = -1.571f + 2*atan2f32( sqrtf32(1 + 2*(q_d(0)*q_d(2) - q_d(1)*q_d(3))), sqrtf32(1 - 2*(q_d(0)*q_d(2) + q_d(1)*q_d(3))));
 				att_sp_degs(2) = atan2f32( 2* (q_d(0)*q_d(3) + q_d(1)*q_d(2)), 1-2*(q_d(2)*q_d(2) + q_d(1)*q_d(1)));
 
-				// att_sp_degs(axis)
-				// PX4_INFO(att_sp_degs,"\f\t\f\t\f");
-				// vehicle_torque_setpoint.xyz[axis] = k_gain_vec(axis)*(vehicle_attitude_s)
-				vehicle_torque_setpoint.xyz[axis] = k_gain_vec(axis)*(_rates_setpoint(axis) - rates(axis)) - d_gain_vec(axis)*(angular_accel(axis)) + ff_gain_vec(axis)*_rates_setpoint(axis);
-				vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis)/u_unNormalize;
+				att_act_degs(0) = atan2f32(2 * (q_act(0)*q_act(1) + q_act(2)*q_act(3)), q_act(0)*q_act(0) - q_act(1)*q_act(1) - q_act(2)*q_act(2) + q_act(3)*q_act(3));
+				att_act_degs(1) = -1.571f + 2*atan2f32( sqrtf32(1 + 2*(q_act(0)*q_act(2) - q_act(1)*q_act(3))), sqrtf32(1 - 2*(q_act(0)*q_act(2) + q_act(1)*q_act(3))));
+				att_act_degs(2) = atan2f32( 2* (q_act(0)*q_act(3) + q_act(1)*q_act(2)), 1-2*(q_act(2)*q_act(2) + q_act(1)*q_act(1)));
+
+				// PX4_INFO("%f\t %f\t %f\t",att_act_degs(0),att_act_degs(1),att_act_degs(2));
+
+
+				// };
+				vehicle_torque_setpoint.xyz[axis] = 0.15f*(att_sp_degs(axis) - att_act_degs(axis)) + k_gain_vec(axis)*(_rates_setpoint(axis) - rates(axis)) - d_gain_vec(axis)*(_rates_setpoint(axis) - rates(axis));
+				// vehicle_torque_setpoint.xyz[axis] = k_gain_vec(axis)*(_rates_setpoint(axis) - rates(axis)) - d_gain_vec(axis)*(angular_accel(axis)) + ff_gain_vec(axis)*_rates_setpoint(axis);
+				// vehicle_torque_setpoint.xyz[axis] -= eso_acc(axis)*inertia_xyz(axis)/u_unNormalize;
 				vehicle_torque_setpoint.xyz[axis] = math::constrain(vehicle_torque_setpoint.xyz[axis],-1.f,1.0f);
 				// Update ESO state
 				eso_pos(axis) += dt*( eso_vel(axis) + eso_gain_col1(0)*(rates(axis) - eso_pos(axis)) + eso_gain_col2(0)*(angular_accel(axis) - eso_vel(axis)) );

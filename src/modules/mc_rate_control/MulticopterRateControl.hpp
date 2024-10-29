@@ -110,8 +110,8 @@ private:
 	// Test stuff
 	uORB::Subscription _att_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
 	uORB::Subscription _vehicle_att_sub{ORB_ID(vehicle_attitude)};
-	matrix::Vector3f att_sp{}, att_sp_degs{};
-	matrix::Vector4f q_d;
+	matrix::Vector3f att_sp{}, att_sp_degs{}, att_act_degs{};
+	matrix::Vector4f q_d, q_act;
 
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 
@@ -129,8 +129,8 @@ private:
 	// Test we can subscribe to a new state, multiply it by a number, and print it
 	uORB::Subscription _vehicle_position_sub{ORB_ID(vehicle_local_position)};
 	vehicle_local_position_s _vehicle_local_position{};
-	double test;
-	double test2;
+	// double test;
+	// double test2;
 	bool BenDebug = 0; // Turn this new and amazing feature on and off
 	bool _should_run_eso = 0; // Should we run the torque level ESO? 1 for yes, default matches the parameter
 
